@@ -1,37 +1,27 @@
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.exceptions import APIException
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, status
 from .models import Photo
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from .serializers import PhotosListSerializer, PhotosAddSerializer
 
 
-# Create your views here.
+class ListCreatePhotoItem(generics.ListCreateAPIView):
+    model = Photo
 
-
-class PhotosAPIView(APIView):
-    serializer_class = PhotosAddSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return PhotosAddSerializer
+        return PhotosListSerializer
 
     def get_queryset(self):
         return Photo.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        photos = self.get_queryset()
-        serializer = PhotosListSerializer(photos, many=True)
-
-        return Response(serializer.data)
-
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         photo_data = request.data
-
-        if not photo_data['image'] and not photo_data['url']:
-            raise APIException("You must pass and url to img or image")
 
         photo = Photo.objects.create(
             title=photo_data['title'],
             albumId_id=photo_data['albumId'],
-            image=photo_data['image'] if photo_data['image'] else None,
             url=photo_data['url'] if photo_data['url'] else None
         )
 
@@ -43,4 +33,38 @@ class PhotosAPIView(APIView):
                 'Dominant Color': photo.color
             }
         }
-        return Response(response, status=200, template_name=None, headers=None, content_type=None)
+        return Response(response, status=status.HTTP_202_ACCEPTED)
+
+
+class GetUpdateDeletePhotoItem(generics.RetrieveUpdateDestroyAPIView):
+    model = Photo
+    serializer_class = PhotosAddSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Photo.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        photo = get_object_or_404(Photo, pk=kwargs['id'])
+        photo_data = request.data
+
+        photo.title = photo_data['title']
+        photo.albumId_id = photo_data['albumId']
+        photo.url = photo_data['url']
+        photo.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+
+# @api_view(('GET',))
+# def import_images_api(request):
+#     response = requests.get('https://jsonplaceholder.typicode.com/photos')
+#     if response.status_code == 200:
+#         json_response = response.json()
+#         for x in range(1, 5):
+#             Photo.objects.create(
+#                 title=json_response[x]['title'],
+#                 albumId_id=json_response[x]['albumId'],
+#                 url=json_response[x]['url']
+#             )
+#     return Response(status=status.HTTP_202_ACCEPTED)
+

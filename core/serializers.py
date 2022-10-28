@@ -11,10 +11,4 @@ class PhotosListSerializer(serializers.ModelSerializer):
 class PhotosAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = ['title', 'albumId', 'image', 'url']
-
-
-class AlbumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Album
-        fields = '__all__'
+        fields = ['title', 'albumId', 'url']

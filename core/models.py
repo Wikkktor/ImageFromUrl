@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 from .helpers import get_attrs_from_img
 from django.conf import settings
 
+
 # Create your models here.
 class Album(models.Model):
     name = models.CharField(max_length=255)
@@ -28,13 +29,11 @@ class Photo(models.Model):
             file_name = self.url.split('/')[-1]
             self.image.save(f"{file_name}", File(img_temp), save=False)
 
-            # Todo piece of code is replaying
             attrs = get_attrs_from_img(img_temp)
             self.width = attrs['width']
             self.height = attrs['height']
             self.color = attrs['color']
         if self.image and not self.url:
-
             attrs = get_attrs_from_img(self.image)
             self.width = attrs['width']
             self.height = attrs['height']
