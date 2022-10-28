@@ -21,7 +21,7 @@ class ListCreatePhotoItem(generics.ListCreateAPIView):
 
         photo = Photo.objects.create(
             title=photo_data['title'],
-            albumId_id=photo_data['albumId'],
+            albumId=photo_data['albumId'],
             url=photo_data['url'] if photo_data['url'] else None
         )
 
@@ -49,7 +49,7 @@ class GetUpdateDeletePhotoItem(generics.RetrieveUpdateDestroyAPIView):
         photo_data = request.data
 
         photo.title = photo_data['title']
-        photo.albumId_id = photo_data['albumId']
+        photo.albumId = photo_data['albumId']
         photo.url = photo_data['url']
         photo.save()
         return Response(status=status.HTTP_202_ACCEPTED)
