@@ -18,7 +18,7 @@ class Photo(models.Model):
     height = models.IntegerField(null=True, blank=True)
     color = models.CharField(max_length=10, null=True, blank=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
-    url = models.CharField(max_length=1000, null=True, blank=True)
+    url = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def save(self, *args, **kwargs):
